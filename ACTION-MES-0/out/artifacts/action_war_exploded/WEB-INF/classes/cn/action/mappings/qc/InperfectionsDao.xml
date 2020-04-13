@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.qc.dao.InperfectionsDao">
+
+    <sql id="Columns">
+        a.id,
+        a.pn as "product.id",
+        b.productName as "product.productName",
+        a.bn,
+        a.wo_id as "workOrder.id",
+        c.orderCode as "workOrder.orderCode",
+        a.desc,
+        a.del_flag,
+        a.remarks,
+        a.create_by as "createBy.id",
+        a.create_date,
+        a.update_by as "updateBy.id",
+        a.update_date
+    </sql>
+    <sql id="Joins">
+        left join bas_product b on b.id=a.pn
+        left join bas_workorder c on c.id=a.wo_id
+    </sql>
+    <!-- 1.根据id查询 -->
+    <select id="get" resultType="Inperfections">
+        select
+        <include refid="Columns"/>
+        from qc_inperfections a
+        <include refid="Joins"/>
+        where a.id=#{id}
+    </select>
+    <!--2.根据条件查询  -->
+    <select id="findList" resultType="Inperfections">
+        select
+        <include refid="Columns"/>
+        from qc_inperfections a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        <if test="product.productName!=null and product.productName!=''">
+            and b.productName like concat('%',#{product.productName},'%')
+        </if>
+        order by a.update_date desc
+    </select>
+    <!--3.查询所有  -->
+    <select id="findAllList" resultType="Inperfections">
+        select
+        <include refid="Columns"/>
+        from qc_inperfections a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        order by a.update_date desc
+    </select>
+    <!--4.插入  -->
+    <insert id="insert">
+    insert into qc_inperfections(
+    id,
+    pn,
+    bn,
+    wo_id,
+    `desc`,
+    create_by,
+    create_date,
+    update_by,
+    update_date,
+    del_flag,
+    remarks
+    )values(
+    #{id},
+    #{product.id},
+    #{product.lotNumber},
+    #{workOrder.id},
+    #{desc},
+    #{delFlag},
+    #{remarks},
+    #{createBy.id},
+    #{createDate},
+    #{updateBy.id},
+    #{updateDate}
+    )
+    </insert>
+    <!--5.修改  -->
+    <update id="update">
+        update qc_inperfections set
+        pn=#{product.id},
+        bn=#{product.lotNumber},
+        wo_id=#{workOrder.id},
+        `desc`=#{desc},
+        update_by=#{updateBy.id},
+        update_date=#{updateDate}
+        where id=#{id}
+    </update>
+    <!--6.删除  -->
+    <update id="delete">
+        update qc_inperfections set
+        del_flag=#{DEL_FLAG_DELETE}
+        where id=#{id}
+    </update>
+</mapper>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.bas.dao.IPhotoDao">
+    <sql id="iPhotoColumns">
+    	a.id,
+    	
+    	
+    	a.organization as "organization.id",
+    	d.name as "organization.name",
+    	a.cell_id as "workCell.id",
+    	b.cellName as "workCell.cellName",
+    	a.station_id as "workStationInfos.id",
+    	c.stationName as "workStationInfos.stationName",
+  
+		a.iphotoDistance,
+		a.iphotoWay,
+		a.workEnvironment,
+		a.qrCode,				
+		a.type,
+		a.spec,
+		a.supplier,
+		a.manufacturer,
+		a.factoryNumber,
+		a.purpose,
+		a.buyDate,
+		a.person,
+		a.ip,
+		a.comBaudrate,
+		a.comDataseat,
+		a.comBegin,
+		a.comEnd,
+		a.checkMode,
+		a.sysParam,
+		a.create_by as "createBy.id",
+		a.create_date,
+		a.update_by as "updateBy.id",
+		a.update_date,
+		a.del_flag
+    </sql>
+    
+    
+    <sql id="iPhotoJoins">
+		
+		left join bas_workstationinfos c on c.id=a.station_id
+		left join bas_workcell b on b.id = a.cell_id
+		left join sys_office d on d.id = a.organization
+    </sql>
+    
+    
+	<select id="get" resultType="IPhoto">
+		SELECT
+			<include refid="iPhotoColumns"/>
+		FROM bas_iphoto a
+		<include refid="iPhotoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="IPhoto">
+		SELECT
+			<include refid="iPhotoColumns"/>
+		FROM bas_iphoto a
+		<include refid="iPhotoJoins"/>
+		
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} 
+		<if test="type != null and type != ''">
+			AND a.type = #{type}
+		</if>
+		<if test="spec != null and spec != ''">
+			AND a.spec = #{spec}
+		</if>
+		<if test="qrCode != null and qrCode != ''">
+			AND a.qrCode LIKE 
+					<if test="dbName == 'oracle'">'%'||#{qrCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{qrCode}+'%'</if>
+					<if test="dbName == 'mysql'">CONCAT('%', #{qrCode}, '%')</if>
+		</if>
+		ORDER BY a.type, a.spec, a.update_date DESC
+	</select>
+	
+	<select id="findAllList" resultType="IPhoto">
+		SELECT
+			<include refid="iPhotoColumns"/>
+		FROM bas_iphoto a
+		<include refid="iPhotoJoins"/>
+		
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} 
+		ORDER BY a.type, a.spec, a.update_date DESC
+	</select>
+	
+	
+	
+	<insert id="insert">
+		INSERT INTO bas_iphoto (
+			iphotoDistance,
+			iphotoWay,
+			workEnvironment, 
+			qrCode, 
+			type, 
+			spec, 
+			cell_id,
+			station_id,
+			supplier, 
+			manufacturer, 
+			factoryNumber, 
+			purpose, 
+			buyDate, 
+			person, 
+			organization, 
+			ip, 
+			comBaudrate, 
+			comDataseat, 
+			comBegin, 
+			comEnd, 
+			checkMode, 
+			sysParam,
+			id,
+			create_by, 
+			create_date, 
+			update_by, 
+			update_date, 
+			remarks, 
+			del_flag
+		) VALUES (
+			#{iphotoDistance}, 
+			#{iphotoWay}, 
+			#{workEnvironment},
+			#{qrCode}, 
+			#{type}, 
+			#{spec}, 
+			#{workCell.id},
+			#{workStationInfos.id},
+			#{supplier}, 
+			#{manufacturer}, 
+			#{factoryNumber}, 
+			#{purpose}, 
+			#{buyDate}, 
+			#{person}, 
+			#{organization.id}, 
+			#{ip}, 
+			#{comBaudrate}, 
+			#{comDataseat}, 
+			#{comBegin}, 
+			#{comEnd}, 
+			#{checkMode}, 
+			#{sysParam},
+			#{id}, 
+			#{createBy.id}, 
+			#{createDate}, 
+			#{updateBy.id}, 
+			#{updateDate}, 
+			#{remarks}, 
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bas_iphoto SET 
+			iphotoDistance=#{iphotoDistance},
+			iphotoWay=#{iphotoWay},
+			workEnvironment=#{workEnvironment},
+			qrCode=#{qrCode},
+			type=#{type},
+			spec=#{spec},
+			cell_id=#{workCell.id},
+			station_id=#{workStationInfos.id},
+			supplier=#{supplier},
+			manufacturer=#{manufacturer},
+			factoryNumber=#{factoryNumber},
+			purpose=#{purpose},
+			buyDate=#{buyDate},
+			person=#{person},
+			organization=#{organization.id},
+			ip=#{ip},
+			comBaudrate=#{comBaudrate},
+			comDataseat=#{comDataseat},
+			comBegin=#{comBegin},
+			comEnd=#{comEnd},
+			checkMode=#{checkMode},
+			sysParam=#{sysParam},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}, 
+			remarks = #{remarks}
+			WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bas_iphoto SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

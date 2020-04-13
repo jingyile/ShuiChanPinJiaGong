@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.bas.dao.MaterialDao">
+    <sql id="Columns">
+    id,
+    batchNum,
+    mType,
+    mName,
+    supplierId,
+    supplierName,
+    purchaseDate,
+    quantity,
+    unit,
+    remarks,
+    del_flag,
+    create_by AS "createBy.id",
+    create_date,
+    update_by AS "updateBy.id",
+    update_date
+</sql>
+    <!--1.get 根据id查询-->
+    <select id="get" resultType="Material">
+        select 
+          <include refid="Columns"/>
+        from material
+        where id=#{id}
+    </select>
+    <!--1.get 根据id查询-->
+    <select id="findList" resultType="Material">
+        select
+          <include refid="Columns"/>
+        from material
+        where del_flag = #{DEL_FLAG_NORMAL}
+        <if test="mType!=null and mType!=''">
+            and mType=#{mType}
+        </if>
+        order by purchaseDate
+    </select>
+
+    <select id="findSum" resultType="Material">
+        select
+        sum(quantity) as "sum"
+        from material
+        where del_flag = #{DEL_FLAG_NORMAL} and mType=#{mType}
+    </select>
+
+    <update id="update">
+        UPDATE material SET
+			remarks=#{remarks},
+			update_by = #{updateBy.id},
+            update_date = #{updateDate}
+        WHERE id = #{id}
+    </update>
+
+    <!--６.删除-->
+    <update id="delete">
+		UPDATE material SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+</mapper>

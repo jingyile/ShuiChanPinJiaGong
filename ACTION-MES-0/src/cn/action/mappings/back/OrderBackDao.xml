@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.back.dao.OrderBackDao">
+    <sql id="Columns">
+    a.orderCode,
+    b.orderNo,
+    b.indentor,
+    c.productName,
+    b.quantity,
+    b.unit,
+    b.orderDate,
+    b.salesman
+    </sql>
+
+    <sql id="Joins">
+        left join orders b on b.orderNo=a.order_id
+        left join bas_product c on c.id=b.product_id
+    </sql>
+    <select id="get" resultType="OrderBack">
+        select
+        <include refid="Columns"/>
+        from bas_workorder a
+        <include refid="Joins"/>
+        where a.id=#{id}
+    </select>
+
+    <select id="findList" resultType="OrderBack">
+        select
+        <include refid="Columns"/>
+        from bas_workorder a
+        <include refid="Joins"/>
+        where a.orderCode=#{orderCode} and a.del_flag=#{DEL_FLAG_NORMAL}
+        order by a.update_date desc
+    </select>
+</mapper>

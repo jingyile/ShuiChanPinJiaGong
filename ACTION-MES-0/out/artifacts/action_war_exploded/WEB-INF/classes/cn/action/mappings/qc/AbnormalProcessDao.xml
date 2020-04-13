@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.qc.dao.AbnormalProcessDao">
+    <sql id="Columns">
+        a.id,
+        a.pro_id as "process.id",
+        b.proName as "process.proName",
+        a.problem,
+        a.report_user as "reportUser.id",
+        c.name as "reportUser.name",
+        a.report_time as "reportTime",
+        a.test,
+        a.test_user as "testUser.id",
+        d.name as "testUser.name",
+        a.test_time as "testTime",
+        a.state,
+        a.del_flag as "delFlag",
+        a.remarks,
+        a.create_by as "createBy.id",
+        a.create_date,
+        a.update_by as "updateBy.id",
+        a.update_date
+    </sql>
+    <sql id="Joins">
+        left join tec_process b on b.id=a.pro_id
+        left join sys_user c on c.id=a.report_user
+        left join sys_user d on d.id=a.test_user
+    </sql>
+
+    <!-- 1.根据id查询 -->
+    <select id="get" resultType="AbnormalProcess">
+        select
+        <include refid="Columns" />
+        from qc_abnormal_process a
+        <include refid="Joins"/>
+        where a.id=#{id}
+    </select>
+    <!--2.根据条件查询  -->
+    <select id="findList" resultType="AbnormalProcess">
+        select
+        <include refid="Columns" />
+        from qc_abnormal_process a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        <if test="process.proName!=null and process.proName!=''">
+            and b.proName like concat('%',#{process.proName},'%')
+        </if>
+        order by a.update_date desc
+    </select>
+    <!--3.查询所有  -->
+    <select id="findAllList" resultType="AbnormalProcess">
+        select
+        <include refid="Columns"/>
+        from qc_abnormal_process a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        order by a.update_date desc
+    </select>
+    <!--4.插入  -->
+    <insert id="insert">
+        insert into qc_abnormal_process(
+        id,
+        pro_id,
+        problem,
+        report_user,
+        report_time,
+        test,
+        test_user,
+        test_time,
+        state,
+        create_by,
+        create_date,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+        )values(
+        #{id},
+        #{process.id},
+        #{problem},
+        #{reportUser.id},
+        #{reportTime},
+        #{test},
+        #{testUser.id},
+        #{testTime},
+        #{state},
+        #{delFlag},
+        #{remarks},
+        #{createBy.id},
+        #{createDate},
+        #{updateBy.id},
+        #{updateDate}
+        )
+    </insert>
+    <!--5.修改  -->
+    <update id="update">
+        update qc_abnormal_process set
+        id=#{id},
+        pro_id=#{process.id},
+        problem=#{problem},
+        report_user=#{reportUser.id},
+        report_time=#{reportTime},
+        test=#{test},
+        test_user=#{testUser.id},
+        test_time=#{testTime},
+        state=#{state},
+        update_by=#{updateBy.id},
+        update_date=#{updateDate}
+        where id=#{id}
+    </update>
+    <!--6.删除  -->
+    <update id="delete">
+        update qc_abnormal_process set
+        del_flag=#{DEL_FLAG_DELETE}
+        where id=#{id}
+    </update>
+</mapper>

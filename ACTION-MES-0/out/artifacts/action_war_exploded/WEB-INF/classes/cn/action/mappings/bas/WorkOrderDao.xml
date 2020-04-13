@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.bas.dao.WorkOrderDao">
+        <sql id="Columns">
+a.id,
+a.order_id as "order.id",
+b.orderNo as "order.orderNo",
+a.orderCode,
+a.unitName,
+a.orderType,
+a.amount,
+a.estStartTime,
+a.estEndTime,
+a.actStartTime,
+a.inAmount,
+a.outAmount,
+a.scrapAmount,
+a.state,
+a.line_id as "line.id",
+c.lineName as "line.lineName",
+a.product_id as "product.id",
+d.productName as "product.productName",
+        a.del_flag,
+        a.remarks,
+        a.create_by AS "createBy.id",
+        a.create_date,
+        a.update_by AS "updateBy.id",
+        a.update_date
+    </sql>
+
+        <sql id="Joins">
+		LEFT JOIN orders b ON b.id = a.order_id
+		LEFT JOIN bas_line c ON c.lineNumber = a.line_id
+		LEFT JOIN bas_product d ON d.id = a.product_id
+    </sql>
+
+        <!--1.根据id查询-->
+        <select id="get" resultType="WorkOrder">
+            SELECT
+            <include refid="Columns"/>
+            FROM bas_workorder a
+            <include refid="Joins"/>
+            WHERE a.id = #{id}
+        </select>
+
+	<select id="findList" resultType="WorkOrder">
+		SELECT
+		<include refid="Columns"/>
+		FROM bas_workorder a
+		<include refid="Joins"/>
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		<if test="orderCode != null and orderCode != ''">
+			AND a.orderCode like concat('%',#{orderCode},'%')
+		</if>
+		ORDER BY a.update_date DESC
+	</select>
+
+	<select id="findAllList" resultType="WorkOrder">
+		SELECT
+		<include refid="Columns"/>
+		FROM bas_workorder a
+		<include refid="Joins"/>
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		ORDER BY a.update_date DESC
+	</select>
+        <!--４.添加-->
+        <insert id="insert">
+		INSERT INTO bas_workorder(
+			id,
+order_id,
+orderCode,
+unitName,
+orderType,
+amount,
+estStartTime,
+estEndTime,
+actStartTime,
+inAmount,
+outAmount,
+scrapAmount,
+state,
+line_id,
+product_id,
+del_flag,
+remarks,
+create_by,
+create_date,
+update_by,
+update_date
+		) VALUES (
+			#{id},
+			#{order.id},
+			#{orderCode},
+			#{unitName},
+			#{orderType},
+			#{amount},
+			#{estStartTime},
+			#{estEndTime},
+			#{actStartTime},
+			#{inAmount},
+			#{outAmount},
+			#{scrapAmount},
+			#{state},
+			#{line.id},
+			#{product.id},
+			#{delFlag},
+		    #{remarks},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE bas_workorder SET
+		    order_id=#{order.id},
+			orderCode = #{orderCode},
+			unitName = #{unitName},
+			orderType = #{orderType},
+			amount = #{amount},
+			estStartTime=#{estStartTime},
+			estEndTime=#{estEndTime},
+			actStartTime=#{actStartTime},
+			inAmount=#{inAmount},
+			outAmount=#{outAmount},
+			scrapAmount=#{scrapAmount},
+			state = #{state},
+			line_id = #{line.id},
+			product_id = #{product.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE bas_workorder SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+    </mapper>

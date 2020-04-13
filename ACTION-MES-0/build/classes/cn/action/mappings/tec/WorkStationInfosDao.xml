@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.tec.dao.WorkStationInfosDao">
+    <sql id="Columns">
+        a.id,
+        a.stationName,
+        a.stationNo,
+        a.stationMaster,
+        a.create_by as "createBy.id",
+        a.create_date,
+        a.update_by as "updateBy.id",
+        a.update_date,
+        a.remarks,
+        a.del_flag,
+        a.line_id as "line.id",
+        b.lineName as "line.lineName"
+    </sql>
+    <sql id="Joins">
+        left join bas_line b on b.id=a.line_id
+    </sql>
+    <!--查询所有-->
+    <select id="findAllList" resultType="WorkStationInfos">
+        select
+        <include refid="Columns"/>
+        from bas_workstationinfos a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        order by a.update_date desc
+    </select>
+</mapper>

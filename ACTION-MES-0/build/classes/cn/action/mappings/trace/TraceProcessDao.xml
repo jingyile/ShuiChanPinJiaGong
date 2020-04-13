@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.trace.dao.TraceProcessDao">
+
+	<select id="findList" resultType="TraceProcess">
+		SELECT a.* , c.lotNumber as "lotNumber"
+		FROM `tec_process`a
+		RIGHT JOIN tec_flow_process b ON b.pro_id=a.id
+		RIGHT JOIN bas_product c ON c.flow_id=b.flow_id
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} 
+		<if test="lotNumber != null and lotNumber != ''">
+			AND c.lotNumber = #{lotNumber}
+		</if>
+		ORDER BY a.update_date DESC
+	</select>
+</mapper>

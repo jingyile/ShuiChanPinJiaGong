@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.trace.dao.TraceWorkOrderDao">
+
+	<select id="findList"  resultType="TraceWorkOrder">
+		SELECT 
+			a.proCode as "proCode",
+			a.proName as "proName",
+			f.mname as "mname",
+			f.mnum as "mnum",
+			d.orderCode as "orderCode"	
+		FROM tec_process  a
+		LEFT JOIN tec_flow_process b ON b.pro_id=a.id
+		LEFT JOIN bas_product c ON c.flow_id=b.flow_id
+		RIGHT JOIN bas_workorder d ON d.product_id= c.id
+		LEFT JOIN bas_bom e ON e.product_id = c.id
+		LEFT JOIN bas_bom_component f ON f.bom_id=e.id
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} 
+		<if test="orderCode != null and orderCode != ''">
+			AND d.orderCode = #{orderCode}
+		</if>
+	</select>
+</mapper>

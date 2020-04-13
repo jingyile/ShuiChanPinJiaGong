@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.tec.dao.ProcessStationDao">
+    <sql id="Columns">
+            a.id,
+            a.pro_id as "process.id",
+            b.proName as "process.proName",
+            a.station_id as "workStationInfos.id",
+            c.stationName as "workStationInfos.stationName",
+            a.line_id  as "line.id",
+            d.lineName as "line.lineName",
+            a.create_by as "createBy.id",
+            a.create_date,
+            a.update_by as "updateBy.id",
+            a.update_date,
+            a.remarks,
+            a.del_flag
+    </sql>
+
+    <sql id="Joins">
+        left join tec_process b on b.id=a.pro_id
+        left join bas_workstationinfos c on c.id=a.station_id
+        left join bas_line d on d.id=a.line_id
+    </sql>
+    <select id="get" resultType="ProcessStation">
+        select
+        <include refid="Columns"/>
+        from tec_process_station a
+        <include refid="Joins"/>
+        where a.id=#{id}
+    </select>
+
+    <select id="findList" resultType="ProcessStation">
+        select
+        <include refid="Columns"/>
+        from tec_process_station a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        <if test="process.proName!=null and process.proName!=''">
+            and b.proName like concat('%',#{process.proName},'%')
+        </if>
+        order by a.update_date desc
+    </select>
+
+    <select id="findAllList" resultType="ProcessStation">
+        select
+        <include refid="Columns"/>
+        from tec_process_station a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        order by a.update_date desc
+    </select>
+
+    <insert id="insert">
+        insert into tec_process_station(
+        id,
+        pro_id,
+        station_id,
+        line_id,
+        create_by,
+        create_date,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+        )values (
+          #{id},
+          #{process.id},
+          #{workStationInfos.id},
+          #{line.id},
+          #{createBy.id},
+          #{createDate},
+          #{updateBy.id},
+          #{updateDate},
+          #{remarks},
+          #{delFlag}
+        )
+    </insert>
+
+    <update id="update">
+        update tec_process_station set
+        pro_id=#{process.id},
+        station_id=#{workStationInfos.id},
+        line_id=#{line.id},
+        update_by=#{updateBy.id},
+        update_date=#{updateDate}
+        where id=#{id}
+    </update>
+
+    <update id="delete">
+        update tec_process_station set del_flag=#{DEL_FLAG_DELETE}
+       where id=#{id}
+    </update>
+
+    <select id="findProcessStationByStationId" resultType="ProcessStation">
+        SELECT
+        <include refid="Columns"/>
+        FROM tec_process_station a
+        <include refid="Joins"/>
+        WHERE a.station_id= #{workStationInfos.id}
+    </select>
+
+</mapper>

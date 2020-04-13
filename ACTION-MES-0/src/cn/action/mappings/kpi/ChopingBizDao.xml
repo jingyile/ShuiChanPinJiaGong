@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.kpi.dao.ChopingBizDao">
+    <!--1.根据条件查询-->
+    <select id="findList" resultType="ChopingBiz">
+        select
+        DATE_FORMAT(a.time,'%Y-%m-%d') as time ,
+        a.employeeName,
+        sum(a.pieces) as pieces,
+        round(sum(a.pieces)*d.performTypeNum / 100,2) as money
+        from log_chopingbizrecords a
+        inner join bas_workcell b on b.id=a.workCellId
+        inner join kpi_perform_station c on c.station_id=b.station_id
+        inner join kpi_performtype d on d.id=c.perform_id
+        <where>
+            <if test="employeeName!=null and employeeName!=''">
+                a.employeeName like concat('%',#{employeeName},'%')
+            </if>
+            <choose>
+                <when
+                        test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+                    and DATE_FORMAT(a.time,'%Y-%m-%d') between #{startTime} and #{endTime}
+                </when>
+                <when
+                        test="startTime!=null and startTime!=''">
+                    and DATE_FORMAT(a.time,'%Y-%m-%d') &gt;=#{startTime}
+                </when>
+                <when
+                        test="endTime!=null and endTime!=''">
+                    and DATE_FORMAT(a.time,'%Y-%m-%d') &lt;=#{endTime}
+                </when>
+            </choose>
+        </where>
+        group by DATE_FORMAT(a.time,'%Y-%m-%d'),a.cardId
+        order by DATE_FORMAT(a.time,'%Y-%m-%d')
+    </select>
+</mapper>

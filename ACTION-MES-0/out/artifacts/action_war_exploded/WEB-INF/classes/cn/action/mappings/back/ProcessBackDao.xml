@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.back.dao.ProcessBackDao">
+    <sql id="Columns">
+    a.lotNumber,
+    b.flowName,
+    c.proName,
+    d.stationName,
+    e.cellName,
+    f.employeeNo,
+    f.employeeName
+    </sql>
+    <!--产品表与生产流程表连接,生产流程表与流程工序关系表连接，-->
+    <!--流程工序关系表与工序表连接，工序表与工序工站关系表连接，-->
+    <!--工序工站关系表与工站表连接，工站表与工位表连接，-->
+    <!--工位表与员工表连接-->
+    <sql id="Joins">
+        left join tec_flow b on b.id=a.flow_id
+        left join tec_flow_process g on g.flow_id=b.id
+        left join tec_process c on c.id=g.pro_id
+        left join tec_process_station h on h.pro_id=c.id
+        left join bas_workstationinfos d on d.id=h.station_id
+        left join bas_workcell e on e.station_id=d.id
+        left join bas_employees f on f.employeeName=e.cellMaster
+    </sql>
+    <select id="get" resultType="ProcessBack">
+        select
+        <include refid="Columns"/>
+        from bas_product a
+        <include refid="Joins"/>
+        where a.id=#{id}
+    </select>
+
+    <select id="findList" resultType="ProcessBack">
+        select
+        <include refid="Columns"/>
+        from bas_product a
+        <include refid="Joins"/>
+        where a.lotNumber=#{lotNumber} and a.del_flag=#{DEL_FLAG_NORMAL}
+        order by a.update_date desc
+    </select>
+</mapper>

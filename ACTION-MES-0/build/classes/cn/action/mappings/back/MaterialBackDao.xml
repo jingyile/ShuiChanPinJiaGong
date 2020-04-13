@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.back.dao.MaterialBackDao">
+    <sql id="Columns">
+        a.lotNumber,
+        a.productName,
+        c.mType,
+        c.mNum,
+        c.unit,
+        a.create_by as "createBy.id",
+        a.create_date,
+        a.update_by  as "updateBy.id",
+        a.update_date,
+        a.remarks,
+        a.del_flag
+    </sql>
+
+    <sql id="Joins">
+        left join bas_bom b on b.product_id=a.id
+        left join bas_bom_detail c on c.bom_id=b.id
+    </sql>
+
+    <select id="get" resultType="MaterialBack">
+        select
+        <include refid="Columns"/>
+        from bas_product a
+        <include refid="Joins"/>
+        where a.id=#{id}
+    </select>
+
+    <select id="findList" resultType="MaterialBack">
+        select
+        <include refid="Columns"/>
+        from bas_product a
+        <include refid="Joins"/>
+        where a.lotNumber=#{lotNumber} and a.del_flag=#{DEL_FLAG_NORMAL}
+        order by a.update_date desc
+    </select>
+</mapper>

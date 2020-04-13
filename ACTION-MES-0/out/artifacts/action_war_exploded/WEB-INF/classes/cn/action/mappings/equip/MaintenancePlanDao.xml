@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.equip.dao.MaintenancePlanDao">
+    <sql id="Columns">
+    	id,
+    	equip_type as "equipType",
+    	maintenance,
+        cycle,
+        warn_time as "warnTime",
+        user_name as "user.name",
+        user_id as "user.id",
+		create_by AS "createBy.id",
+		create_date,
+		update_by AS "updateBy.id",
+		update_date,
+		remarks,
+		del_flag
+</sql>
+    <!-- id查询-->
+    <select id="get" resultType="MaintenancePlan">
+      select
+        <include refid="Columns"/>
+      from equip_maintenance_plan
+      where id=#{id}
+    </select>
+
+    <!-- 条件查询-->
+    <select id="findList" resultType="MaintenancePlan">
+        select
+        <include refid="Columns"/>
+        from equip_maintenance_plan
+        where del_flag=#{DEL_FLAG_NORMAL}
+        <if test="equipType!=null and equipType!=''">
+            and equip_type=#{equipType}
+        </if>
+        order by update_date desc
+    </select>
+
+    <!-- 查询所有-->
+    <select id="findAllList" resultType="MaintenancePlan">
+        select
+        <include refid="Columns"/>
+        from equip_maintenance_plan
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        order by update_date desc
+    </select>
+
+    <!-- 插入-->
+    <insert id="insert">
+        insert into equip_maintenance_plan (
+        	id,
+    	    equip_type,
+            maintenance,
+            cycle,
+            warn_time,
+            user_name,
+            user_id,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            remarks,
+            del_flag
+        ) values (
+            #{id},
+            #{equipType},
+            #{maintenance},
+            #{cycle},
+            #{warnTime},
+            #{user.name},
+            #{user.id},
+            #{createBy.id},
+            #{createDate},
+            #{updateBy.id},
+            #{updateDate},
+            #{remarks},
+            #{delFlag}
+        );
+    </insert>
+
+    <!-- 修改-->
+    <update id="update">
+           update equip_maintenance_plan set
+               equip_type= #{equipType},
+               maintenance= #{maintenance},
+               cycle= #{cycle},
+               warn_time = #{warnTime},
+               user_name= #{user.name},
+               user_id= #{user.id},
+               update_by=#{updateBy.id},
+               update_date=#{updateDate}
+        where id=#{id}
+    </update>
+
+    <!-- 删除-->
+    <update id="delete">
+        update equip_maintenance_plan set
+          del_flag=#{DEL_FLAG_DELETE}
+          where id=#{id}
+    </update>
+</mapper>

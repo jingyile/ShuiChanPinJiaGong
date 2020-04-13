@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.bas.dao.ProductDao">
+    <sql id="Columns">
+      a.id,
+      a.productName,
+      a.productAbbr,
+      a.productDesc,
+      a.firstCheck,
+      a.qrCode,
+      a.manageWay,
+      a.lotNumber,
+      a.state,
+      a.productUnit,
+      a.productProp,
+      a.flow_id as "flow.id",
+      b.flowName as "flow.flowName",
+      a.del_flag,
+      a.remarks,
+      a.create_by as "createBy.id",
+      a.create_date,
+      a.update_by as "updateBy.id",
+      a.update_date
+    </sql>
+
+    <sql id="Joins">
+        left join tec_flow b on b.id=a.flow_id
+    </sql>
+    <!--1.根据id查询-->
+    <select id="get" resultType="Product">
+        select
+          <include refid="Columns"/>
+        from bas_product a
+          <include refid="Joins"/>
+        where a.id=#{id}
+    </select>
+    <!--2.多条件查询-->
+    <select id="findList" resultType="Product">
+        select
+        <include refid="Columns"/>
+        from bas_product a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        <if test="productName!=null and productName!=''">
+          and a.productName like concat('%',#{productName},'%')
+        </if>
+        order by a.update_date desc
+    </select>
+    <!--3.查询所有-->
+    <select id="findAllList" resultType="Product">
+        select
+        <include refid="Columns"/>
+        from bas_product a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        order by a.update_date desc
+    </select>
+    <!--4.插入-->
+    <insert id="insert">
+        insert into bas_product (
+          id,
+          productName,
+          productAbbr,
+          productDesc,
+          firstCheck,
+          qrCode,
+          manageWay,
+          lotNumber,
+          state,
+          productUnit,
+          productProp,
+          flow_id,
+          create_by,
+          create_date,
+          update_by,
+          update_date,
+          remarks,
+          del_flag
+        ) values (
+        #{id},
+        #{productName},
+        #{productAbbr},
+        #{productDesc},
+        #{firstCheck},
+        #{qrCode},
+        #{manageWay},
+        #{lotNumber},
+        #{state},
+        #{productUnit},
+        #{productProp},
+        #{flow.id},
+        #{createBy.id},
+        #{createDate},
+        #{updateBy.id},
+        #{updateDate},
+        #{remarks},
+        #{delFlag}
+        );
+    </insert>
+    <!--5.修改-->
+    <update id="update">
+        update bas_product set
+            productName=#{productName},
+            productAbbr=#{productAbbr},
+            productDesc=#{productDesc},
+            qrCode=#{qrCode},
+            manageWay=#{manageWay},
+            lotNumber=#{lotNumber},
+            state=#{state},
+            productUnit=#{productUnit},
+            productProp=#{productProp},
+            flow_id=#{flow.id},
+            update_by=#{updateBy.id},
+            update_date=#{updateDate}
+        where id=#{id}
+    </update>
+    <!--6.删除-->
+    <update id="delete">
+        update bas_product set
+          del_flag=#{DEL_FLAG_DELETE}
+          where id=#{id}
+    </update>
+</mapper>

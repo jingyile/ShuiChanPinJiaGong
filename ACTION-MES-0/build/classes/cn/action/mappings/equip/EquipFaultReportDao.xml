@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.equip.dao.EquipFaultReportDao">
+<sql id="Columns">
+        a.id,
+        a.equip_id as "equipId",
+        a.equip_no as "equipNo",
+        a.equip_type as "equipType",
+        a.equip_loc as "equipLoc",
+        a.fault_desc as "faultDesc",
+        a.status,
+        a.report_person as "reportPerson",
+        a.assign_time as "assignTime",
+        a.maintenance_worker as "maintenanceWorker",
+        b.id as "equipRepair.id",
+        a.create_by AS "createBy.id",
+		a.create_date as "createDate" ,
+		a.update_by AS "updateBy.id",
+		a.update_date as "updateDate",
+        a.remarks,
+        a.del_flag as "delFlag"
+</sql>
+    <sql id="Joins">
+        left join equip_repair b on b.mid=a.id
+    </sql>
+    <!-- id-->
+    <select id="get" resultType="EquipFaultReport">
+        select
+          <include refid="Columns"/>
+        from equip_fault_report a
+          <include refid="Joins"/>
+        where a.id=#{id}
+    </select>
+    <!-- 条件-->
+    <select id="findList" resultType="EquipFaultReport">
+        select
+        <include refid="Columns"/>
+        from equip_fault_report a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        <if test="equipType!=null and equipType!=''">
+            and a.equip_type=#{equipType}
+        </if>
+        <if test="equipLoc!=null and equipLoc!=''">
+            and a.equip_loc=#{equipLoc}
+        </if>
+        <if test="status!=null and status!=''">
+            and a.status=#{status}
+        </if>
+      order by a.update_date desc
+    </select>
+    <!-- 所有-->
+    <select id="findAllList" resultType="EquipFaultReport">
+        select
+        <include refid="Columns"/>
+        from equip_fault_report a
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        order by a.update_date desc
+    </select>
+
+    <insert id="insert">
+    insert into equip_fault_report(
+        id,
+        equip_id,
+        equip_no,
+        equip_type,
+        equip_loc,
+        fault_desc,
+        status,
+        report_person,
+        assign_time,
+        maintenance_worker,
+        create_by,
+        create_date,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+    )values (
+        #{id},
+        #{equipId},
+        #{equipNo},
+        #{equipType},
+        #{equipLoc},
+        #{faultDesc},
+        #{status},
+        #{reportPerson},
+        #{assignTime,},
+        #{maintenanceWorker},
+        #{createBy.id},
+        #{createDate},
+        #{updateBy.id},
+        #{updateDate},
+        #{remarks},
+        #{delFlag}
+    )
+</insert>
+
+    <update id="update">
+        update equip_fault_report set
+            id=#{id},
+            equip_id=#{equipId},
+            equip_no=#{equipNo},
+            equip_type=#{equipType},
+            equip_loc=#{equipLoc},
+            fault_desc=#{faultDesc},
+            status=#{status},
+            report_person=#{reportPerson},
+            assign_time=#{assignTime,},
+            maintenance_worker=#{maintenanceWorker},
+            update_by=#{updateBy.id},
+            update_date=#{updateDate}
+            where id = #{id}
+    </update>
+</mapper>

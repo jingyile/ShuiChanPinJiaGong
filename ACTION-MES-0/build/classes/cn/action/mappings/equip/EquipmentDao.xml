@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.equip.dao.EquipmentDao">
+<sql id="Columns">
+    	id,
+    	organization,
+    	qrCode,
+    	type,
+    	spec,
+		supplier,
+		manufacturer,
+		factoryNumber,
+		purpose,
+		buyDate,
+		person,
+		ip,
+		comBaudrate,
+		comDataseat,
+		comBegin,
+		comEnd,
+		checkMode,
+		sysParam,
+		create_by AS "createBy.id",
+		create_date,
+		update_by AS "updateBy.id",
+		update_date,
+		remarks,
+		del_flag
+</sql>
+    <!-- id-->
+    <select id="get" resultType="Equipment">
+        select * from
+        (
+        select
+        <include refid="Columns"/>
+        from bas_cardreader
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_codeprinter
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_electronsteelyard
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_iphoto
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_pad
+        where del_flag=#{DEL_FLAG_NORMAL}
+        ) equipment
+        where id=#{id}
+    </select>
+
+    <!-- 设备编号-->
+    <select id="getByQRCode" resultType="Equipment">
+        select * from
+        (
+        select
+        <include refid="Columns"/>
+        from bas_cardreader
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_codeprinter
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_electronsteelyard
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_iphoto
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_pad
+        where del_flag=#{DEL_FLAG_NORMAL}
+        ) equipment
+        where qrCode=#{qrCode}
+    </select>
+
+
+    <!-- 条件-->
+    <select id="findList" resultType="Equipment">
+        select * from
+        (
+        select
+        <include refid="Columns"/>
+        from bas_cardreader
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_codeprinter
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_electronsteelyard
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_iphoto
+        where del_flag=#{DEL_FLAG_NORMAL}
+
+        union all
+
+        select
+        <include refid="Columns"/>
+        from bas_pad
+        where del_flag=#{DEL_FLAG_NORMAL}
+        ) equipment
+        <where>
+         <if test="type!=null and type!=''" >
+            type=#{type}
+         </if>
+         <if test="spec!=null and spec!=''">
+            and spec = #{spec}
+         </if>
+         <if test="qrCode!=null and qrCode!=''">
+            and qrCode like concat('%',#{qrCode},'%')
+         </if>
+        </where>
+        order by update_date desc
+    </select>
+</mapper>
+

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.trace.dao.TraceBomComponentDao">
+     <sql id="Columns">
+    	a.id,
+    	a.bom_id AS "bom.id",
+    	c.bomName as "bom.bomName",
+		a.mname,
+		a.mnum,
+		a.proCode,
+		a.proName,
+		a.whours,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag
+    </sql>
+    
+    
+    <sql id="Joins">
+		LEFT JOIN bas_bom c ON c.id = a.bom_id
+		LEFT JOIN bas_product b ON b.id=c.product_id
+    </sql>
+
+	<select id="get" resultType="TraceBomComponent">
+		SELECT 
+			<include refid="Columns"/>
+		FROM bas_bom_component a
+			<include refid="Joins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TraceBomComponent">
+		SELECT
+			<include refid="Columns"/>
+		FROM bas_bom_component a
+			<include refid="Joins"/>
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} 
+		<if test="lotNumber != null and lotNumber != ''">
+			and b.lotNumber=#{lotNumber}
+		</if>
+		ORDER BY a.update_date DESC
+	</select>
+	
+	
+</mapper>

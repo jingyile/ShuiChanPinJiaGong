@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.bas.dao.WorkShopDao">
+    <sql id="workShopColumns">
+        a.id,
+        a.shopName,
+        a.shopNo,
+        a.master,
+        a.description,
+        a.factory_id as "factory.id",
+        c.factoryName as "factory.factoryName",
+        a.remarks,
+        a.del_flag,
+        a.create_by as "createBy.id",
+        a.create_date,
+        a.update_by as "updateBy.id",
+        a.update_date
+    </sql>
+    <sql id="workShopJoins">
+        left join bas_factory c on c.id=a.factory_id
+    </sql>
+    <!--1.根据id查询车间-->
+    <select id="get" resultType="WorkShop">
+        select
+        <include refid="workShopColumns"/>
+        from bas_workshop a
+        <include refid="workShopJoins"/>
+        where a.id=#{id}
+    </select>
+    <!--2.分页带条件查询-->
+    <select id="findList" resultType="WorkShop">
+        select
+        <include refid="workShopColumns"/>
+        from bas_workshop a
+        <include refid="workShopJoins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        <if test="shopName!=null and shopName!=''">
+            --     concat表示用百分号来连接factoryName
+            and a.shopName like concat('%',#{shopName},'%')
+        </if>
+        order by a.update_date desc
+    </select>
+    <!--3.查询所有车间-->
+    <select id="findAllList" resultType="WorkShop">
+        select
+        <include refid="workShopColumns"/>
+        from bas_workshop a
+        <include refid="workShopJoins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        order by a.update_date desc
+    </select>
+    <!--4.添加-->
+    <insert id="insert">
+        insert into bas_workshop(
+            id,
+            shopName,
+            shopNo,
+            master,
+            description,
+            factory_id,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            remarks,
+            del_flag
+        )values (
+            #{id},
+            #{shopName},
+            #{shopNo},
+            #{master},
+            #{description},
+            #{factory.id},
+            #{createBy.id},
+            #{createDate},
+            #{updateBy.id},
+            #{updateDate},
+            #{remarks},
+            #{delFlag}
+        )
+    </insert>
+    <!--5.修改-->
+    <update id="update">
+        update bas_workshop set
+            shopName=#{shopName},
+            shopNo=#{shopNo},
+            master=#{master},
+            description=#{description},
+            factory_id=#{factory.id},
+            remarks=#{remarks},
+            update_by=#{updateBy.id},
+            update_date=#{updateDate}
+    where id=#{id}
+    </update>
+    <!--6删除-->
+    <update id="delete">
+    update bas_workshop set del_flag=#{DEL_FLAG_DELETE}
+    where id=#{id}
+  </update>
+</mapper>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.bas.dao.AndroidPADDao">
+    	
+    <sql id="padColumns">
+    	a.id,
+    	a.organization AS "organization.id",
+    	d.name as "organization.name",
+    	a.qrCode,
+    	a.type,
+    	a.spec,
+    	a.cell_id as "workCell.id",
+		b.cellName as "workCell.cellName",
+		a.station_id as "workStationInfos.id",
+		c.stationName as "workStationInfos.stationName",
+		a.supplier,
+		a.manufacturer,
+		a.factoryNumber,
+		a.purpose,
+		a.buyDate,
+		a.person,
+		a.ip,
+		a.comBaudrate,
+	
+		a.comDataseat,
+		a.comBegin,
+		a.comEnd,
+		a.checkMode,
+		a.sysParam,
+		a.pADSC,
+		a.pADNucleus,
+		a.pADmemory,
+		a.capacity,
+		
+		a.remarks,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag
+    </sql>
+    
+    
+    <sql id="padJoins">
+		left join sys_office d on d.id = a.organization
+		left join bas_workcell b  on b.id = a.cell_id
+		left join bas_workstationinfos c on c.id = a.station_id
+		
+    </sql>
+    
+    <!--根据id查询PAD信息  -->
+	<select id="get" resultType="AndroidPAD">
+		select
+			<include refid="padColumns"/>
+		from bas_pad a
+		<include refid="padJoins"/>
+		
+		where a.id = #{id}
+	</select>
+	<!--根据条件查询  -->
+	<select id="findList" resultType="AndroidPAD">
+		select 
+			<include refid="padColumns"/>
+		from bas_pad a
+		<include refid="padJoins"/>
+		where a.del_flag = #{DEL_FLAG_NORMAL} 
+		<if test="type != null and type != ''">
+			and a.type = #{type}
+		</if>
+		<if test="spec != null and spec != ''">
+			and a.spec = #{spec}
+		</if>
+		<if test="qrCode != null and qrCode != ''">
+			and a.qrCode like concat('%',#{qrCode},'%') 
+					<!-- <if test="dbName == 'oracle'">'%'||#{qrCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{qrCode}+'%'</if>
+					<if test="dbName == 'mysql'">CONCAT('%', #{qrCode}, '%')</if> -->
+		</if>
+		order by type, spec, update_date desc
+	</select>
+	<!--查询所有PAD  -->
+	<select id="findAllList" resultType="AndroidPAD">
+		select 
+			<include refid="padColumns"/>
+		from bas_pad a
+		<include refid="padJoins"/>
+		where a.del_flag = #{DEL_FLAG_NORMAL} 
+		order by a.type, a.spec, a.update_date desc
+	</select>
+	
+	
+	<!--添加  -->
+	<insert id="insert">
+		insert into bas_pad (
+			qrCode,
+			type,
+			spec,
+			supplier,
+			manufacturer,
+			factoryNumber,
+			purpose,
+			buyDate,
+			person,
+			organization,
+			ip,
+			comBaudrate,
+			comDataseat,
+			comBegin,
+			comEnd,
+			checkMode,
+			sysParam,
+			pADSC,
+			pADNucleus,
+			pADMemory,
+			capacity,
+			cell_id,
+			station_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			id
+		) values (  
+			#{qrCode}, 
+			#{type}, 
+			#{spec}, 
+			#{supplier}, 
+			#{manufacturer}, 
+			#{factoryNumber}, 
+			#{purpose}, 
+			#{buyDate}, 
+			#{person}, 
+			#{organization.id}, 
+			#{ip}, 
+			#{comBaudrate}, 
+			#{comDataseat}, 
+			#{comBegin}, 
+			#{comEnd}, 
+			#{checkMode}, 
+			#{sysParam},
+			#{pADSC},
+			#{pADNucleus},
+			#{pADMemory},
+			#{capacity},
+			#{workCell.id},
+			#{workStationInfos.id},
+			#{createBy.id}, 
+			#{createDate}, 
+			#{updateBy.id}, 
+			#{updateDate}, 
+			#{remarks}, 
+			#{delFlag},
+			#{id}
+		)
+	</insert>
+	<!--修改  -->
+	<update id="update">
+		update bas_pad set 
+			qrCode=#{qrCode}, 
+			type=#{type}, 
+			spec=#{spec}, 
+			supplier=#{supplier}, 
+			manufacturer=#{manufacturer}, 
+			factoryNumber=#{factoryNumber}, 
+			purpose=#{purpose}, 
+			buyDate=#{buyDate}, 
+			person=#{person}, 
+			organization=#{organization.id}, 
+			ip=#{ip}, 
+			comBaudrate=#{comBaudrate}, 
+			comDataseat=#{comDataseat}, 
+			comBegin=#{comBegin}, 
+			comEnd=#{comEnd}, 
+			checkMode=#{checkMode}, 
+			sysParam=#{sysParam},
+			pADSC=#{pADSC},
+			pADNucleus=#{pADNucleus},
+			pADMemory=#{pADMemory},
+			capacity=#{capacity},
+			cell_id=#{workCell.id},
+			station_id=#{workStationInfos.id},
+			update_by=#{updateBy.id}, 
+			update_date=#{updateDate}
+		where id = #{id}
+	</update>
+	<!--删除  -->
+	<update id="delete">
+		update bas_pad set 
+			del_flag = #{DEL_FLAG_DELETE}
+		where id = #{id}
+	</update>
+	
+</mapper>

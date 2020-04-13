@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.kpi.dao.PerformStationDao">
+    <sql id="Columns">
+        a.id,
+        a.perform_id as "performType.id",
+        b.performTypeName as "performType.performTypeName",
+        a.station_id as "workStationInfos.id",
+        c.stationName as "workStationInfos.stationName",
+        a.del_flag as delFlag,
+        a.remarks,
+        a.create_by as "createBy.id",
+        a.create_date as createDate,
+        a.update_by as "updateBy.id",
+        a.update_date as "updateDate"
+    </sql>
+    <sql id="Joins">
+        left join kpi_performtype b on b.id=a.perform_id
+        left join bas_workstationinfos c on c.id=a.station_id
+    </sql>
+    <!--1.根据id查询：get-->
+    <select id="get" resultType="PerformStation">
+        select
+        <include refid="Columns"/>
+        from kpi_perform_station a
+        <include refid="Joins"/>
+        where a.id=#{id}
+    </select>
+    <!--2.根据条件查询-->
+    <select id="findList" resultType="PerformStation">
+        select
+        <include refid="Columns"/>
+        from kpi_perform_station a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        <if test="performType.performTypeName!=null and performType.performTypeName!=''">
+            and b.performTypeName like concat('%',#{performType.performTypeName},'%')
+        </if>
+        order by a.perform_id
+    </select>
+    <!--3.查询所有：findAllList-->
+    <select id="findAllList" resultType="PerformStation">
+        select
+        <include refid="Columns"/>
+        from kpi_perform_station a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        order by a.perform_id
+    </select>
+    <!--4.插入-->
+    <insert id="insert">
+        insert into kpi_perform_station(
+        id,
+        perform_id,
+        station_id,
+        del_flag,
+        remarks,
+        create_by,
+        create_date,
+        update_by,
+        update_date
+        )values (
+        #{id},
+        #{performType.id},
+        #{workStationInfos.id},
+        #{delFlag},
+        #{remarks},
+        #{createBy.id},
+        #{createDate},
+        #{updateBy.id},
+        #{updateDate}
+        )
+    </insert>
+    <!--5修改-->
+    <update id="update">
+        update kpi_perform_station set
+         perform_id=#{performType.id},
+         station_id=#{workStationInfos.id},
+         update_by=#{updateBy.id},
+         update_date=#{updateDate}
+        where id=#{id}
+    </update>
+    <!--6.删除-->
+    <update id="delete">
+        update kpi_perform_station set
+          del_flag=#{DEL_FLAG_DELETE}
+        where id=#{id}
+    </update>
+</mapper>

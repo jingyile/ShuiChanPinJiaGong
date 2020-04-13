@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.qc.dao.ViolactionDao">
+    <sql id="Columns">
+        a.id,
+        a.station_id as "workStationInfos.id",
+        b.stationName as "workStationInfos.stationName",
+        a.pro_id as "process.id",
+        c.proCode as "process.proCode",
+        c.proName as "process.proName",
+        a.userName,
+        a.violation_des as violationDes,
+        a.violation_time as violationTime,
+        a.create_by as "createBy.id",
+        a.create_date,
+        a.update_by as "updateBy.id",
+        a.update_date,
+        a.del_flag,
+        a.remarks
+
+    </sql>
+    <sql id="Joins">
+        left join bas_workstationinfos b on b.id=a.station_id
+        left join tec_process c on c.id=a.pro_id
+
+    </sql>
+    <!--1.根据id查询-->
+    <select id="get" resultType="Violaction">
+        SELECT
+        <include refid="Columns"/>
+        FROM qc_violaction a
+        <include refid="Joins"/>
+        WHERE a.id=#{id}
+    </select>
+    <!--2。根据条件查询-->
+    <select id="findList" resultType="Violaction">
+    SELECT
+    <include refid="Columns"/>
+    FROM qc_violaction a
+    <include refid="Joins"/>
+    WHERE a.del_flag=#{DEL_FLAG_NORMAL}
+    <if test="workStationInfos.stationName!=null and workStationInfos.stationName!=''">
+        and b.stationName like contant('%',#{workStationInfos.stationName},'%')
+    </if>
+        order by a.update_date desc
+    </select>
+    <!--3。查询所有-->
+    <select id="findAllList" resultType="Violaction">
+        SELECT
+        <include refid="Columns"/>
+        FROM qc_violaction a
+        <include refid="Joins"/>
+        WHERE a.del_flag=#{DEL_FLAG_NORMAL}
+
+        order by a.update_date desc
+    </select>
+    <!--4。插入-->
+    <insert id="insert">
+        insert into qc_violaction(
+            id,
+			station_id,
+			pro_id,
+			userName,
+			violation_des,
+			violation_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			remarks
+        )values(
+            #{id},
+            #{workStationInfos.id},
+            #{process.id}
+            #{userName},
+            #{violationDes},
+            #{violationTime},
+            #{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+			#{remarks},
+        )
+    </insert>
+
+    <!--修改-->
+
+    <update id="update">
+        UPDATE qc_violaction SET
+        station_id=#{workStationInfos.id},
+        pro_id=#{process.id}
+        userName=#{userName},
+        violation_des=#{violationDes},
+        violation_time=#{violationTime},
+        update_by=#{updateBy.id},
+		update_date=#{updateDate}
+        WHERE id=#{id}
+
+    </update>
+    <!--删除-->
+    <update id="delete">
+        UPDATE qc_violaction SET
+          del_flag=#{DEL_FLAG_DELETE}
+        WHERE id=#{id}
+
+    </update>
+
+</mapper>

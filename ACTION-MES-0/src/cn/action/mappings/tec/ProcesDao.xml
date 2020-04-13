@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.tec.dao.ProcessDao">
+    <select id="get" resultType="Process">
+        select * from tec_process
+        where id=#{id}
+    </select>
+    <!--分页查询，可以按照企业名称-->
+    <select id="findList" resultType="Process">
+        select * from tec_process
+        where del_flag=#{DEL_FLAG_NORMAL}
+        <if test="proCode!=null and proCode!=''">
+            and proCode like concat('%',#{proCode},'%')
+        </if>
+        order by proCode
+    </select>
+
+    <select id="findAllList" resultType="Process">
+        select * from tec_process
+        where del_flag=#{DEL_FLAG_NORMAL}
+        order by proCode
+    </select>
+
+    <insert id="insert">
+        insert into tec_process(
+        id,
+        proCode,
+        proName,
+        proDesc,
+        create_by,
+        create_date,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+        )values (
+        #{id},
+        #{proCode},
+        #{proName},
+        #{proDesc},
+        #{createBy.id},
+        #{createDate},
+        #{updateBy.id},
+        #{updateDate},
+        #{remarks},
+        #{delFlag}
+        )
+    </insert>
+    <update id="update">
+        update tec_process set
+        proCode=#{proCode},
+        proName=#{proName},
+        proDesc=#{proDesc},
+        update_by= #{updateBy.id},
+        update_date=#{updateDate}
+    where id=#{id}
+    </update>
+    <!--删除-->
+    <update id="delete">
+       update tec_process set del_flag=#{DEL_FLAG_DELETE}
+       where id=#{id}
+    </update>
+</mapper>

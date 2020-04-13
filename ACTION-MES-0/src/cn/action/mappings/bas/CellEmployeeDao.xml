@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.bas.dao.CellEmployeeDao">
+        <sql id="columns">
+    a.id,
+    a.employee_id as "employee.id",
+    c.employeeName as "employee.employeeName",
+    a.cell_id as "workCell.id",
+    b.cellName as "workCell.cellName",
+    a.remarks,
+    a.del_flag,
+    a.create_by AS "createBy.id",
+    a.create_date,
+    a.update_by AS "updateBy.id",
+    a.update_date
+    </sql>
+
+        <sql id="joins">
+		LEFT JOIN bas_workcell b ON b.id = a.cell_id
+		LEFT JOIN bas_employees c ON c.id = a.employee_id
+    </sql>
+
+        <!--1.根据id查询-->
+        <select id="get" resultType="CellEmployee">
+            SELECT
+            <include refid="columns"/>
+            FROM bas_cell_employee a
+            <include refid="joins"/>
+            WHERE a.id = #{id}
+        </select>
+
+        <!--2.分页查询-->
+        <select id="findList" resultType="CellEmployee">
+            SELECT
+            <include refid="columns"/>
+            FROM bas_cell_employee a
+            <include refid="joins"/>
+            WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="employee.employeeName != null and employee.employeeName != ''">
+                and c.employeeName like concat('%',#{employee.employeeName},'%')
+            </if>
+            <if test="workCell.cellName != null and workCell.cellName != ''">
+                and b.cellName like concat('%',#{workCell.cellName},'%')
+            </if>
+            ORDER BY a.update_date DESC <!--升序排序-->
+        </select>
+
+        <!--３.查询所有-->
+        <select id="findAllList" resultType="CellEmployee">
+            SELECT
+            <include refid="columns"/>
+            FROM bas_cell_employee a
+            <include refid="joins"/>
+            WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+            ORDER BY employeeNo
+        </select>
+
+<!--    根据员工id查询关系信息-->
+    <select id="findbyEmployeeId" resultType="CellEmployee">
+        SELECT
+        <include refid="columns"/>
+        FROM bas_cell_employee a
+        <include refid="joins"/>
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        and a.employee_id=#{employee.id}
+        ORDER BY employeeNo
+    </select>
+        <!--４.添加-->
+        <insert id="insert">
+		INSERT INTO bas_cell_employee(
+	id,
+   employee_id,
+cell_id,
+del_flag,
+remarks,
+create_by,
+create_date,
+update_by,
+update_date
+		) VALUES (
+			#{id},
+			#{employee.id},
+			#{workCell.id},
+			#{delFlag},
+			#{remarks},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate}
+		)
+	</insert>
+
+        <!--５.修改-->
+        <update id="update">
+        UPDATE bas_cell_employee SET
+			employee_id=#{employee.id},
+			cell_id=#{workCell.id},
+			remarks=#{remarks},
+			update_by = #{updateBy.id},
+            update_date = #{updateDate}
+        WHERE id = #{id}
+    </update>
+
+        <!--６.删除-->
+        <update id="delete">
+		UPDATE bas_cell_employee SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+    </mapper>

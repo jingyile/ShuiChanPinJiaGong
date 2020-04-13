@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.bas.dao.WorkTimeDao">
+    <!-- 按照周查询 -->
+    <select id="findWeek" resultType="WorkTime">
+        select
+        DATE_FORMAT(clockOff,'%y年%v周') as week,sum(workTime) as workTime,employeeName,employeeNo,cellName
+        from mount_guard
+        where del_flag=#{DEL_FLAG_NORMAL}
+        <if test="eName!=null and eName!='' ">
+            and employeeName=#{eName}
+        </if>
+        <if test="cName!=null and cName!='' ">
+            and cellName=#{cName}
+        </if>
+        group by week
+    </select>
+
+    <!-- 按照月查询 -->
+    <select id="findMonth" resultType="WorkTime">
+        select
+        DATE_FORMAT(clockOff,'%y年%m月') as month,sum(workTime) as workTime,employeeName,employeeNo,cellName
+        from mount_guard
+        where del_flag=#{DEL_FLAG_NORMAL}
+        <if test="eName!=null and eName!='' ">
+            and employeeName=#{eName}
+        </if>
+        <if test="cName!=null and cName!='' ">
+            and cellName=#{cName}
+        </if>
+        group by month
+    </select>
+    <!-- 按照年查询 -->
+    <select id="findYear" resultType="WorkTime">
+        select
+        DATE_FORMAT(clockOff,'%y年') as year,sum(workTime) as workTime,employeeName,employeeNo,cellName
+        from mount_guard
+        where del_flag=#{DEL_FLAG_NORMAL}
+        <if test="eName!=null and eName!='' ">
+            and employeeName=#{eName}
+        </if>
+        <if test="cName!=null and cName!='' ">
+            and cellName=#{cName}
+        </if>
+        group by year
+    </select>
+
+
+
+
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.bas.dao.BomDetailDao">
+    <sql id="Columns">
+        a.id,
+        a.bom_id as "bom.id",
+        b.bomName as "bom.bomName",
+        a.mType,
+        a.mNum,
+        a.unit,
+        a.remarks,
+        a.del_flag,
+        a.create_by as "createBy.id",
+        a.create_date,
+        a.update_by as "updateBy.id",
+        a.update_date
+    </sql>
+    <sql id="Joins">
+         left join bas_bom b on b.id=a.bom_id
+    </sql>
+    <!-- id查询-->
+    <select id="get" resultType="BomDetail">
+        select
+        <include refid="Columns"/>
+        from bas_bom_detail a
+        <include refid="Joins"/>
+        where a.id=#{id}
+    </select>
+    <!-- 条件查询-->
+    <select id="findList" resultType="BomDetail">
+        select
+        <include refid="Columns"/>
+        from bas_bom_detail a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        <if test="bom!=null">
+          <if test="bom.bomName!=null and bom.bomName!=''">
+            and b.bomName like concat('%',#{bom.bomName},'%')
+          </if>
+          <if test="bom.id!=null and bom.id!=''">
+              and a.bom_id=#{bom.id}
+          </if>
+        </if>
+        order by bom_id
+    </select>
+    <!-- 所有查询-->
+    <select id="findAllList" resultType="BomDetail">
+        select
+        <include refid="Columns"/>
+        from bas_bom_detail a
+        <include refid="Joins"/>
+        where a.del_flag=#{DEL_FLAG_NORMAL}
+        order by bom_id
+    </select>
+    <!-- 插入-->
+    <insert id="insert">
+      insert into bas_bom_detail(
+        id,
+        bom_id,
+        mType,
+        mNum,
+        unit,
+        del_flag,
+        remarks,
+        create_by,
+        create_date,
+        update_by,
+        update_date
+      )values (
+        #{id},
+        #{bom.id},
+        #{mType},
+        #{mNum},
+        #{unit},
+        #{delFlag},
+        #{remarks},
+        #{createBy.id},
+        #{createDate},
+        #{updateBy.id},
+        #{updateDate}
+      )
+    </insert>
+    <!-- 修改-->
+    <update id="update">
+           update bas_bom_detail set
+                bom_id=#{bom.id},
+                mType=#{mType},
+                mNum=#{mNum},
+                unit=#{unit},
+                update_by#{updateBy.id},
+                update_date#{updateDate}
+        where id=#{id}
+    </update>
+    <!-- 删除-->
+    <update id="delete">
+        update bas_bom_detail set
+          del_flag=#{DEL_FLAG_DELETE}
+          where id=#{id}
+    </update>
+</mapper>

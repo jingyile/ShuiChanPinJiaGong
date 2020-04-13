@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.bas.dao.EmployeeDao">
+    <sql id="eColumns">
+    a.id,
+   a.employeeNo,
+   a.employeeName,
+   a.workDate,
+   a.sex,
+   a.age,
+   a.telNum,
+   a.address,
+   a.email,
+   a.idCard,
+   a.officeId as "office.id",
+   c.name as "office.name",
+   a.remarks,
+   a.del_flag,
+   a.create_by,
+   a.create_date,
+   a.update_by,
+   a.update_date
+    </sql>
+
+    <sql id="eJoins">
+		LEFT JOIN sys_office c ON c.id = a.officeId
+    </sql>
+
+    <!--1.根据id查询-->
+    <select id="get" resultType="Employee">
+        SELECT
+        <include refid="eColumns"/>
+        FROM bas_employees a
+        <include refid="eJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <!--2.分页查询-->
+    <select id="findList" resultType="Employee">
+        SELECT
+        <include refid="eColumns"/>
+        FROM bas_employees a
+        <include refid="eJoins"/>
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="employeeNo != null and employeeNo != ''">
+            and a.employeeNo like concat('%',#{employeeNo},'%')
+        </if>
+        <if test="employeeName != null and employeeName != ''">
+            and a.employeeName like concat('%',#{employeeName},'%')
+        </if>
+        ORDER BY a.employeeNo DESC <!--升序排序-->
+    </select>
+
+    <!--３.查询所有-->
+    <select id="findAllList" resultType="Employee">
+        SELECT
+        <include refid="eColumns"/>
+        FROM bas_employees a
+        <include refid="eJoins"/>
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        ORDER BY employeeNo
+    </select>
+
+    <!--４.添加-->
+    <insert id="insert">
+		INSERT INTO bas_employees(
+	id,
+employeeNo,
+employeeName,
+workDate,
+sex,
+age,
+telNum,
+address,
+email,
+idCard,
+officeId,
+remarks,
+del_flag,
+create_by,
+create_date,
+update_by,
+update_date
+		) VALUES (
+			#{id},
+			#{employeeNo},
+			#{employeeName},
+			#{workDate},
+			#{sex},
+			#{age},
+			#{telNum},
+			#{address},
+			#{email},
+			#{idCard},
+			#{office.id},
+			#{remarks},
+			#{delFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate}
+		)
+	</insert>
+
+    <!--５.修改-->
+    <update id="update">
+        UPDATE bas_employees SET
+       employeeNo=#{employeeNo},
+			employeeName=#{employeeName},
+			workDate=#{workDate},
+		    sex=#{sex},
+			age=#{age},
+			telNum=#{telNum},
+			address=#{address},
+			email=#{email},
+			idCard=#{idCard},
+			officeId=#{office.id},
+			remarks=#{remarks},
+			update_by = #{updateBy.id},
+        update_date = #{updateDate}
+        WHERE id = #{id}
+    </update>
+
+    <!--６.删除-->
+    <update id="delete">
+		UPDATE bas_employees SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

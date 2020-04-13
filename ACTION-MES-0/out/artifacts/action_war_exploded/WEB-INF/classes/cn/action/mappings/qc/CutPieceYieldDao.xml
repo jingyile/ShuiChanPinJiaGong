@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.qc.dao.CutPieceYieldDao">
+
+    <select id="findList" resultType="CutPieceYield">
+        select
+        cardId,
+        employeeName,
+        workCellId,
+        sum(qualified) as allQualified,
+        count(qualified) as allPieces,
+        (count(qualified)-sum(qualified))/count(qualified) as yield
+        from log_cutpiecequalitytestingrecords
+        <where>
+            <choose>
+                <when test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+                    time between #{startTime} and #{endTime}
+                </when>
+                <when test="startTime!=null and startTime!=''">
+                    time =#{startTime}
+                </when>
+                <when test="endTime!=null and endTime!=''">
+                    time  =#{endTime}
+                </when>
+            </choose>
+        </where>
+        group by cardId
+    </select>
+</mapper>

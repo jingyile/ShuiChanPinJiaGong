@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.action.modules.equip.dao.EquipRepairDao">
+    <sql id="Columns">
+        id,
+        mid,
+        fault_type as "faultType",
+        fault_reason as "faultReason",
+        fault_desc as "faultDesc",
+        fault_imgs as "faultImgs",
+        create_by AS "createBy.id",
+		create_date,
+		update_by AS "updateBy.id",
+		update_date,
+		remarks,
+		del_flag
+    </sql>
+    <!-- id查询-->
+    <select id="get" resultType="EquipRepair">
+        select
+        <include refid="Columns"></include>
+        from equip_repair
+        where  id=#{id}
+    </select>
+    <!-- 插入-->
+    <insert id="insert">
+        insert into equip_repair (
+        id,
+        mid,
+        fault_type,
+        fault_reason,
+        fault_desc,
+        fault_imgs,
+        create_by,
+        create_date,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+        ) values (
+        #{id},
+        #{mid},
+        #{faultType},
+        #{faultReason},
+        #{faultDesc},
+        #{faultImgs},
+        #{createBy.id},
+        #{createDate},
+        #{updateBy.id},
+        #{updateDate},
+        #{remarks},
+        #{delFlag}
+        )
+    </insert>
+</mapper>
+
